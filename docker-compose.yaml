@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: hata-postgres
+    restart: unless-stopped
+    environment:
+      # Суперпользоватьль для базы данных
+      POSTGRES_USER: ${HATA_SEARCHER_DB_SUPERUSER}
+      POSTGRES_PASSWORD: ${HATA_SEARCHER_DB_PASSWORD}
+
+      # Настройки для БД hata-parser
+      PARSER_DB_NAME: ${PARSER_DB_NAME}
+      PARSER_DB_USER: ${PARSER_DB_USER}
+      PARSER_DB_PASSWORD: ${PARSER_DB_PASSWORD}
+
+      # Настройки для БД hata-backoffice
+      BACKOFFICE_DB_NAME: ${BACKOFFICE_DB_NAME}
+      BACKOFFICE_DB_USER: ${BACKOFFICE_DB_USER}
+      BACKOFFICE_DB_PASSWORD: ${BACKOFFICE_DB_PASSWORD}
+
+      # Настройки для БД hata-client-finder
+      CLIENT_FINDER_DB_NAME: ${CLIENT_FINDER_DB_NAME}
+      CLIENT_FINDER_DB_USER: ${CLIENT_FINDER_DB_USER}
+      CLIENT_FINDER_DB_PASSWORD: ${CLIENT_FINDER_DB_PASSWORD}
+
+      # Настройки для БД hata-bot
+      BOT_DB_NAME: ${BOT_DB_NAME}
+      BOT_DB_USER: ${BOT_DB_USER}
+      BOT_DB_PASSWORD: ${BOT_DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
