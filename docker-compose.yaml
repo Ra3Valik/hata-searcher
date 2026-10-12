@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:18
+    image: postgres:16-alpine
     container_name: hata-postgres
     restart: unless-stopped
     environment:
@@ -28,15 +28,21 @@ services:
       BOT_DB_USER: ${BOT_DB_USER}
       BOT_DB_PASSWORD: ${BOT_DB_PASSWORD}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
+      test: ["CMD-SHELL", "pg_isready -U ${HATA_SEARCHER_DB_SUPERUSER}"]
       interval: 30s
       timeout: 60s
       retries: 5
       start_period: 80s
+    networks:
+        - hata-network
     ports:
       - "5432:5432"
     volumes:
+      - ./postgres/init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh:ro
       - postgres_data:/var/lib/postgresql/data
 
 volumes:
   postgres_data:
+
+networks:
+  hata-network:
